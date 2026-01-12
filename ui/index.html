@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Sistem de Recomandare Muzică - Demo UI</title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding: 20px;
+            }
+
+            .container {
+                max-width: 1400px;
+                margin: 0 auto;
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+                padding: 30px;
+            }
+
+            h1 {
+                color: #333;
+                margin-bottom: 10px;
+                font-size: 2em;
+            }
+
+            .subtitle {
+                color: #666;
+                margin-bottom: 30px;
+                font-size: 0.95em;
+            }
+
+            .search-section {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 30px;
+            }
+
+            .search-form {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+                flex-wrap: wrap;
+            }
+
+            .input-group {
+                display: flex;
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            label {
+                font-weight: 600;
+                color: #333;
+                font-size: 0.9em;
+            }
+
+            input[type="number"] {
+                padding: 10px;
+                border: 2px solid #ddd;
+                border-radius: 6px;
+                font-size: 1em;
+                width: 120px;
+            }
+
+            input[type="number"]:focus {
+                outline: none;
+                border-color: #667eea;
+            }
+
+            button {
+                padding: 10px 24px;
+                background: #667eea;
+                color: white;
+                border: none;
+                border-radius: 6px;
+                font-size: 1em;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background 0.3s;
+                align-self: flex-end;
+            }
+
+            button:hover {
+                background: #5568d3;
+            }
+
+            button:disabled {
+                background: #ccc;
+                cursor: not-allowed;
+            }
+
+            .error {
+                background: #fee;
+                color: #c33;
+                padding: 15px;
+                border-radius: 6px;
+                margin-top: 20px;
+                border-left: 4px solid #c33;
+            }
+
+            .results {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 30px;
+                margin-top: 30px;
+            }
+
+            @media (max-width: 900px) {
+                .results {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            .column {
+                background: #f8f9fa;
+                padding: 20px;
+                border-radius: 8px;
+            }
+
+            .column h2 {
+                color: #333;
+                margin-bottom: 15px;
+                font-size: 1.5em;
+                border-bottom: 2px solid #667eea;
+                padding-bottom: 10px;
+            }
+
+            .truth-section {
+                margin-top: 30px;
+                background: #fff3cd;
+                padding: 20px;
+                border-radius: 8px;
+                border-left: 4px solid #ffc107;
+            }
+
+            .truth-section h2 {
+                color: #856404;
+                margin-bottom: 15px;
+                font-size: 1.3em;
+                border-bottom: 2px solid #ffc107;
+                padding-bottom: 10px;
+            }
+
+            .track-list {
+                list-style: none;
+            }
+
+            .track-item {
+                background: white;
+                padding: 12px;
+                margin-bottom: 8px;
+                border-radius: 6px;
+                border-left: 3px solid #667eea;
+                transition: transform 0.2s, box-shadow 0.2s;
+            }
+
+            .track-item.in-truth {
+                background: #d4edda;
+                border-left: 3px solid #28a745;
+            }
+
+            .track-item.in-truth::before {
+                content: "✓ ";
+                color: #28a745;
+                font-weight: bold;
+            }
+
+            .track-item:hover {
+                transform: translateX(4px);
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            }
+
+            .track-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 5px;
+            }
+
+            .track-name {
+                font-weight: 600;
+                color: #333;
+                font-size: 0.95em;
+            }
+
+            .track-rank {
+                background: #667eea;
+                color: white;
+                padding: 2px 8px;
+                border-radius: 4px;
+                font-size: 0.85em;
+                font-weight: 600;
+            }
+
+            .track-artist {
+                color: #666;
+                font-size: 0.9em;
+                margin-top: 4px;
+            }
+
+            .track-score {
+                color: #999;
+                font-size: 0.85em;
+                margin-top: 4px;
+            }
+
+            .truth-item {
+                background: white;
+                padding: 10px;
+                margin-bottom: 6px;
+                border-radius: 6px;
+                border-left: 3px solid #ffc107;
+            }
+
+            .truth-name {
+                font-weight: 600;
+                color: #333;
+                font-size: 0.95em;
+            }
+
+            .truth-artist {
+                color: #666;
+                font-size: 0.9em;
+                margin-top: 4px;
+            }
+
+            .loading {
+                text-align: center;
+                padding: 40px;
+                color: #666;
+                font-size: 1.1em;
+            }
+
+            .empty {
+                text-align: center;
+                padding: 40px;
+                color: #999;
+                font-style: italic;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <h1>🎵 Sistem de Recomandare Muzică</h1>
+            <p class="subtitle">Demo UI - Comparație ALS vs Autoencoder</p>
+
+            <div class="search-section">
+                <form class="search-form" id="searchForm">
+                    <div class="input-group">
+                        <label for="userId">User ID:</label>
+                        <input type="number" id="userId" name="userId" value="0" min="0" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="k">Număr recomandări:</label>
+                        <input type="number" id="k" name="k" value="10" min="1" max="100" required>
+                    </div>
+                    <button type="submit" id="searchBtn">Caută Recomandări</button>
+                </form>
+            </div>
+
+            <div id="error" class="error" style="display: none;"></div>
+
+            <div id="results" style="display: none;">
+                <div class="results">
+                    <div class="column">
+                        <h2>ALS (Baseline)</h2>
+                        <ul class="track-list" id="alsList"></ul>
+                    </div>
+                    <div class="column">
+                        <h2>Autoencoder (Model Principal)</h2>
+                        <ul class="track-list" id="aeList"></ul>
+                    </div>
+                </div>
+
+                <div class="truth-section" id="truthSection" style="display: none;">
+                    <h2>Ground Truth (Test Set)</h2>
+                    <ul class="track-list" id="truthList"></ul>
+                </div>
+            </div>
+
+            <div id="loading" class="loading" style="display: none;">
+                Se încarcă recomandările...
+            </div>
+        </div>
+
+        <script>
+            // API URL - FastAPI rulează pe port 8000
+            // Dacă UI-ul rulează pe alt port (ex: 5500 cu Live Server), folosim portul 8000 pentru API
+            const API_URL = (() => {
+                const origin = window.location.origin;
+                // Dacă origin-ul este pe port 8000 (FastAPI servește UI-ul), folosim origin-ul
+                if (origin.includes(':8000')) {
+                    return origin;
+                }
+                // Altfel, folosim portul 8000 pentru API (indiferent de portul UI-ului)
+                return 'http://127.0.0.1:8000';
+            })();
+            const form = document.getElementById('searchForm');
+            const errorDiv = document.getElementById('error');
+            const resultsDiv = document.getElementById('results');
+            const loadingDiv = document.getElementById('loading');
+            const searchBtn = document.getElementById('searchBtn');
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const userId = parseInt(document.getElementById('userId').value);
+                const k = parseInt(document.getElementById('k').value);
+
+                // Hide previous results and error
+                errorDiv.style.display = 'none';
+                resultsDiv.style.display = 'none';
+                loadingDiv.style.display = 'block';
+                searchBtn.disabled = true;
+
+                try {
+                    const response = await fetch(`${API_URL}/recommendations?user_id=${userId}&k=${k}`);
+
+                    if (!response.ok) {
+                        // Verifică dacă răspunsul este JSON sau HTML
+                        const contentType = response.headers.get('content-type');
+                        if (contentType && contentType.includes('application/json')) {
+                            const error = await response.json();
+                            throw new Error(error.detail || 'Eroare la cererea API');
+                        } else {
+                            throw new Error(`Serverul FastAPI nu răspunde corect. Asigură-te că rulează pe portul 8000: uvicorn src.app:app --reload`);
+                        }
+                    }
+
+                    // Verifică dacă răspunsul este JSON
+                    const contentType = response.headers.get('content-type');
+                    if (!contentType || !contentType.includes('application/json')) {
+                        throw new Error('Serverul a returnat HTML în loc de JSON. Asigură-te că FastAPI rulează pe portul 8000.');
+                    }
+
+                    const data = await response.json();
+                    displayResults(data);
+
+                } catch (error) {
+                    showError(error.message);
+                } finally {
+                    loadingDiv.style.display = 'none';
+                    searchBtn.disabled = false;
+                }
+            });
+
+            function displayResults(data) {
+                // Display ALS recommendations
+                const alsList = document.getElementById('alsList');
+                alsList.innerHTML = '';
+                if (data.als && data.als.length > 0) {
+                    data.als.forEach(track => {
+                        const li = document.createElement('li');
+                        li.className = 'track-item' + (track.in_truth ? ' in-truth' : '');
+                        li.innerHTML = `
+                        <div class="track-header">
+                            <span class="track-name">${escapeHtml(track.name)}</span>
+                            <span class="track-rank">#${track.rank}</span>
+                        </div>
+                        <div class="track-artist">${escapeHtml(track.artist)}</div>
+                        <div class="track-score">Score: ${track.score.toFixed(6)}</div>
+                    `;
+                        alsList.appendChild(li);
+                    });
+                } else {
+                    alsList.innerHTML = '<li class="empty">Nu există recomandări ALS</li>';
+                }
+
+                // Display Autoencoder recommendations
+                const aeList = document.getElementById('aeList');
+                aeList.innerHTML = '';
+                if (data.autoencoder && data.autoencoder.length > 0) {
+                    data.autoencoder.forEach(track => {
+                        const li = document.createElement('li');
+                        li.className = 'track-item' + (track.in_truth ? ' in-truth' : '');
+                        li.innerHTML = `
+                        <div class="track-header">
+                            <span class="track-name">${escapeHtml(track.name)}</span>
+                            <span class="track-rank">#${track.rank}</span>
+                        </div>
+                        <div class="track-artist">${escapeHtml(track.artist)}</div>
+                        <div class="track-score">Score: ${track.score.toFixed(6)}</div>
+                    `;
+                        aeList.appendChild(li);
+                    });
+                } else {
+                    aeList.innerHTML = '<li class="empty">Nu există recomandări Autoencoder</li>';
+                }
+
+                // Display test truth (if exists)
+                const truthSection = document.getElementById('truthSection');
+                const truthList = document.getElementById('truthList');
+                if (data.test_truth && data.test_truth.length > 0) {
+                    truthList.innerHTML = '';
+                    data.test_truth.forEach(track => {
+                        const li = document.createElement('li');
+                        li.className = 'truth-item';
+                        li.innerHTML = `
+                        <div class="truth-name">${escapeHtml(track.name)}</div>
+                        <div class="truth-artist">${escapeHtml(track.artist)}</div>
+                    `;
+                        truthList.appendChild(li);
+                    });
+                    truthSection.style.display = 'block';
+                } else {
+                    truthSection.style.display = 'none';
+                }
+
+                resultsDiv.style.display = 'block';
+            }
+
+            function showError(message) {
+                errorDiv.textContent = `Eroare: ${message}`;
+                errorDiv.style.display = 'block';
+            }
+
+            function escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        </script>
+    </body>
+
+</html>

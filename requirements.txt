@@ -1,0 +1,15 @@
+# Requirements pentru ETAPA 1, ETAPA 2, ETAPA 3, ETAPA 4 și Demo UI
+# ETAPA 1: prepare_data.py (pandas, numpy, scikit-learn)
+# ETAPA 2: simulate_interactions.py, split_train_test.py (pandas, numpy)
+# ETAPA 3: train_als.py (pandas, numpy, scipy, implicit)
+# ETAPA 4: train_autoencoder.py (pandas, numpy, torch, scikit-learn)
+# Demo UI: src/app.py (fastapi, uvicorn)
+
+pandas>=2.0.0
+numpy>=1.24.0
+scikit-learn>=1.3.0
+scipy>=1.10.0
+implicit>=0.7.0
+torch>=2.0.0
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0

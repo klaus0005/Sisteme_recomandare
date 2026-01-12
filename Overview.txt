@@ -1,0 +1,116 @@
+================================================================================
+SISTEM DE RECOMANDARE PENTRU MUZICĂ - REZUMAT PROIECT
+================================================================================
+
+Ce am făcut:
+-----------
+
+Am creat un sistem de recomandare muzicală care compară două metode:
+1. ALS (Alternating Least Squares) - metodă clasică
+2. Autoencoder - model neural (deep learning)
+
+Am folosit features audio Spotify (danceability, energy, valence, etc.) pentru
+a genera recomandări personalizate pentru utilizatori.
+
+Structura proiectului:
+---------------------
+
+Proiectul are 5 etape principale:
+
+1. PREGĂTIRE DATE (prepare_data.py)
+   - Citesc dataset Spotify (100.000+ piese)
+   - Extrag 11 features audio (danceability, energy, valence, etc.)
+   - Normalizez datele
+   - Filtrez artiștii cu minim 20 piese
+   → Generez: tracks_meta.csv, tracks_features_scaled.npy
+
+2. SIMULARE INTERACȚIUNI (simulate_interactions.py + split_train_test.py)
+   - Dataset-ul Spotify nu are useri reali
+   - Simulez 1000 utilizatori fictivi
+   - Fiecare user are un artist favorit (85% piese ale artistului, 15% random)
+   - Split train/test: 80% antrenare, 20% test (per user)
+   → Generez: interactions_train.csv, interactions_test.csv
+
+3. TRAINING ALS (train_als.py)
+   - ALS = matrix factorization clasică pentru implicit feedback
+   - Antrenez modelul pe interacțiuni user-track
+   - Generez recomandări pentru fiecare user
+   → Generez: recs_als.csv (100 recomandări per user)
+
+4. TRAINING AUTOENCODER (train_autoencoder.py)
+   - Autoencoder neural: encoder/decoder
+   - Antrenez pe features audio (nu pe interacțiuni directe)
+   - Encoder produce embedding-uri pentru piese
+   - Recomandări: cosine similarity între profil user (media embedding-urilor)
+     și embedding-urile tuturor pieselor
+   → Generez: recs_autoencoder.csv (100 recomandări per user)
+
+5. EVALUARE (evaluate_recommenders.py)
+   - Evaluez ambele modele cu metrici top-K:
+     * Precision@K (proporția itemi relevanți în top-K)
+     * Recall@K (proporția itemi relevanți găsiți)
+     * NDCG@K (ordinea contează)
+   - K = 5, 10, 20
+   → Generez: eval_results.csv
+
+Rezultate:
+---------
+
+ALS performează mai bine decât Autoencoder:
+- Precision@10: ALS 0.031 vs Autoencoder 0.004 (ALS ~7-8x mai bun)
+- Recall@10: ALS 0.031 vs Autoencoder 0.004
+- NDCG@10: ALS 0.030 vs Autoencoder 0.004
+
+De ce ALS e mai bun?
+- ALS operează pe interacțiuni user-item (collaborative filtering)
+- Captează pattern-uri de co-ascultare între utilizatori
+- Autoencoder se bazează doar pe features audio (content-based)
+- Collaborative filtering > Content-based pentru recomandări personalizate
+
+Demo:
+-----
+
+Am 2 moduri de demo:
+
+1. DEMO CLI (în terminal):
+   python src/demo_cli.py 0
+   → Afișează recomandări pentru user_id 0
+
+2. DEMO UI WEB (interfață vizuală):
+   uvicorn src.app:app --reload
+   → Deschide http://127.0.0.1:8000 în browser
+   → Interfață web cu comparație side-by-side ALS vs Autoencoder
+
+Ce am învățat:
+------------
+
+1. Sistemele de recomandare folosesc metrici top-K (nu RMSE)
+2. Collaborative filtering (ALS) > Content-based (Autoencoder) pentru
+   recomandări personalizate
+3. Evaluarea per user (holdout test) este corectă pentru sisteme de recomandare
+
+Limitări:
+--------
+
+1. Nu avem useri reali → simulăm interacțiuni
+2. Nu abordăm cold start (useri/piese noi)
+3. Posibil bias la popularitate
+4. Lipsa datelor reale de ascultare (play counts, skip rates)
+
+Tehnologii folosite:
+-------------------
+
+- Python, pandas, numpy
+- PyTorch (pentru Autoencoder)
+- implicit (pentru ALS)
+- FastAPI (pentru demo UI)
+- Scikit-learn (pentru normalizare)
+
+Outputs generate:
+----------------
+
+- tracks_meta.csv (109.761 piese)
+- tracks_features_scaled.npy (features normalizate)
+- interactions_train.csv, interactions_test.csv
+- recs_als.csv, recs_autoencoder.csv
+- eval_results.csv (rezultate evaluare)

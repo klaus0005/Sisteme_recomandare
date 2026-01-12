@@ -1,0 +1,62 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# Testing
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+*.ipynb
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+outputs/tmp/
+outputs/final_check_report.txt
+
+# Project specific
+.history/
+outputs/
+*.npy
+*.npz
+
+# Data (dacă nu vrei să incluzi dataset-urile mari)
+# Decomentează dacă vrei să excludi dataset-urile
+# data/*.csv
+
+# HTML pentru prezentare (opțional - poate fi inclus)
+# COD_PENTRU_PREZENTARE.html
