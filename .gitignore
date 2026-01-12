@@ -54,9 +54,9 @@ outputs/
 *.npy
 *.npz
 
-# Data (dacă nu vrei să incluzi dataset-urile mari)
-# Decomentează dacă vrei să excludi dataset-urile
-# data/*.csv
+# Data (dataset-uri mari - excludem pentru a menține repo-ul mic)
+# Dacă vrei să incluzi dataset-urile, decomentează linia de mai jos
+data/*.csv
 
 # HTML pentru prezentare (opțional - poate fi inclus)
 # COD_PENTRU_PREZENTARE.html
